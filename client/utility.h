@@ -32,7 +32,6 @@ bool find_server(const std::string& address, const std::string& port, addrinfo* 
             break;
     }
 
-
     sockfd = socket((*servinfo)->ai_family, (*servinfo)->ai_socktype, (*servinfo)->ai_protocol);
     if (sockfd == INVALID_SOCKET) {
         std::printf("socket error: 0x%x\n", WSAGetLastError());
@@ -40,8 +39,6 @@ bool find_server(const std::string& address, const std::string& port, addrinfo* 
         std::exit(-1);
     }
 
-   // std::printf("[success?] %d\n", ((sockaddr_in*)&((*servinfo)->ai_addr))->sin_port);
-    //std::cin.get();
     server = sockfd;
     return connect(sockfd, (*servinfo)->ai_addr, (*servinfo)->ai_addrlen) == 0;
 }
