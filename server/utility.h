@@ -8,27 +8,16 @@
 
 // Creates a socket and returns the port it is binded to
 int create_socket(addrinfo* hints, addrinfo** servinfo) {
-
-    // Generate a random port instead of hardcoding
-    std::mt19937 mt{ static_cast<std::mt19937::result_type>(
-		std::chrono::steady_clock::now().time_since_epoch().count()
-	) };
-    std::uniform_int_distribution range{ 1024, 65536 };
-    
-    char port[5]{};
-    itoa(range(mt), port, 10);
-
-    int status = getaddrinfo(NULL, port, hints, servinfo);
+    int status = getaddrinfo("127.0.0.1", "8080", hints, servinfo);
     if (status != S_OK) {
         std::fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
         std::exit(-1);
     }
-
+ 
     // Just grab the first available address
     SOCKET sockfd{ };  
     addrinfo* current{ };
     for (current = *servinfo; current != nullptr; current = current->ai_next) {
-
         sockfd = socket(current->ai_family, current->ai_socktype, current->ai_protocol);
         if (sockfd == INVALID_SOCKET)
             std::fprintf(stderr, "socket error: 0x%x\n", WSAGetLastError());
@@ -64,5 +53,4 @@ int initalize_server()
     return create_socket(&hints, &servinfo);
     
 }
-
 #endif

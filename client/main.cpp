@@ -1,37 +1,30 @@
 #include <includes.hpp>
+#include "utility.h"
 
 int main()
 {
+    // boring wsa setup...
     setup_network();
-    std::string domain{ };
-    std::printf("[?] Enter the domain you wish to query: ");
-    std::cin >> domain;
 
-    addrinfo hints{ };
-    addrinfo* servinfo{ nullptr };
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-
-    status = getaddrinfo(domain.c_str(), NULL, &hints, &servinfo);
-    if (status != S_OK) {
-        std::printf("[!] Failed to query %s\n", domain.c_str());
-        std::cin.get();
-        WSACleanup();
-
-        return -1;
-    }
-
-    std::printf("[+] Domains available for %s:\n", domain.c_str());
+    std::string address, port;
+    std::cin >> address >> port;
     std::cin.get();
-    addrinfo current{ };
-    for (auto current = servinfo; current != nullptr; current = current->ai_next) {
-        char ip[INET_ADDRSTRLEN]{ };
-        inet_ntop(AF_INET, &(current->ai_addr), ip, INET_ADDRSTRLEN);
 
-        std::printf("\t[+] IPv4: %s\n", ip);
+    SOCKET server{};
+    if (!initalize_client(address, port, server))
+    {
+        std::printf("[!] failed to initalize client! %d\n", WSAGetLastError());
+        std::cin.get();
+
+        std::exit(-1);
     }
+    
+    std::printf("[+] connected!\n");
+    std::printf("%d\n", WSAGetLastError());
+    char data[256]{};
+    recv(server, data, sizeof(data), 0);
 
-    freeaddrinfo(servinfo);
+    std::printf("[data] %s\n", data);
     std::cin.get();
     WSACleanup();
     return 0;
