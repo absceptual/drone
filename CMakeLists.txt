@@ -4,7 +4,11 @@ project(Drone VERSION 0.1.0 LANGUAGES C CXX)
 include(CTest)
 enable_testing()
 
-add_executable(Drone client/main.cpp)
+file(GLOB SOURCES
+    client/headers/*.h
+    client/*.cpp
+)
+add_executable(Drone ${SOURCES})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

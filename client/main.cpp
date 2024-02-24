@@ -1,19 +1,14 @@
-#include <includes.hpp>
-#include "utility.h"
+#include "headers/includes.h"
+#include "headers/utility.h"
+#include "headers/network.h"
 
 int main()
 {
     // boring wsa setup...
     setup_network();
 
-    std::string address, port;
-    address = "127.0.0.1";
-    port = "8080";
-    // std::cin >> address >> port;
-    // std::cin.get();
-
     SOCKET server{};
-    if (!initalize_client(address, port, server))
+    if (!initalize_client(server))
     {
         std::printf("[!] failed to initalize client! %d\n", WSAGetLastError());
         std::cin.get();
@@ -26,6 +21,7 @@ int main()
                           "Upgrade: websocket\r\n"
                           "Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDf==\r\n"
                           "Sec-WebSocket-Version: 13\r\n\r\n";
+    
     int result = send(server, request.c_str(), request.length(), 0);
     std::printf("%d\n", result);
     if (result == SOCKET_ERROR) {

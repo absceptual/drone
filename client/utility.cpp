@@ -1,14 +1,8 @@
-#ifndef UTILITY_H
-#define UTILITY_H
+#include "headers/utility.h"
 
-#include <random>
-#include <chrono>
-
-#include "../shared/includes.hpp"
-
-bool find_server(const std::string& address, const std::string& port, addrinfo* hints, addrinfo** servinfo, SOCKET& server) 
+bool find_server(const char* address, const char* port, addrinfo* hints, addrinfo** servinfo, SOCKET& server) 
 {
-    int status = getaddrinfo(address.c_str(), port.c_str(), hints, servinfo);
+    int status = getaddrinfo(address, port, hints, servinfo);
     if (status != S_OK) {
         std::printf("getaddrinfo error: %s\n", gai_strerror(status));
         std::cin.get();
@@ -19,7 +13,7 @@ bool find_server(const std::string& address, const std::string& port, addrinfo* 
     SOCKET sockfd{ };  
     addrinfo* current{ };
 
-    int port_number = std::stoi(port.c_str());
+    int port_number = std::stoi(port);
     for (current = *servinfo; current != nullptr; current = current->ai_next) {
         if (port_number != ((sockaddr_in*)(&(current->ai_addr)))->sin_port)
             continue;
@@ -43,25 +37,19 @@ bool find_server(const std::string& address, const std::string& port, addrinfo* 
     return status == 0;
 }
 
-bool initalize_client(const std::string& address, const std::string& port, SOCKET& server)
+void setup_network()
 {
-    addrinfo hints{ };
-    addrinfo* servinfo{ nullptr };
-    
-    // IPV4 only
-    hints.ai_family = AF_INET;
-    
-    // Required to use TCP protocol
-    hints.ai_socktype = SOCK_STREAM; 
+    WSADATA data{ };
+    HRESULT status{ WSAStartup(WINSOCK_VERSION, &data) };
+    if (status != S_OK)
+    {
+        std::fprintf(stderr, "[!] Something went wrong trying to initalize the WSA\n");
+        std::exit(-1);
+    }
 
-    // We are binding whatever IP is provided to a socket
-    hints.ai_flags = AI_PASSIVE; 
-
-    int result = find_server(address, port, &hints, &servinfo, server);
-
-    freeaddrinfo(&hints);
-    freeaddrinfo(servinfo);
-    return result;
+    if (LOBYTE(data.wVersion) != 2 || HIBYTE(data.wVersion) != 2) {
+        std::fprintf(stderr, "[!] Version 2.2 of WinSock is not available\n");
+        WSACleanup();
+        std::exit(-1);
+    }
 }
-
-#endif
