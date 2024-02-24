@@ -15,7 +15,6 @@ bool find_server(const std::string& address, const std::string& port, addrinfo* 
         std::exit(-1);
     }
 
-
     // Just grab the first available address
     SOCKET sockfd{ };  
     addrinfo* current{ };
@@ -40,7 +39,8 @@ bool find_server(const std::string& address, const std::string& port, addrinfo* 
     }
 
     server = sockfd;
-    return connect(sockfd, (*servinfo)->ai_addr, (*servinfo)->ai_addrlen) == 0;
+    status = connect(sockfd, (*servinfo)->ai_addr, (*servinfo)->ai_addrlen);
+    return status == 0;
 }
 
 bool initalize_client(const std::string& address, const std::string& port, SOCKET& server)
@@ -57,10 +57,8 @@ bool initalize_client(const std::string& address, const std::string& port, SOCKE
     // We are binding whatever IP is provided to a socket
     hints.ai_flags = AI_PASSIVE; 
 
-    // std::printf("[-] find_server passed %s and %s\n", address.c_str(), port.c_str());
     int result = find_server(address, port, &hints, &servinfo, server);
 
-    // std::printf("%d\n", WSAGetLastError());
     freeaddrinfo(&hints);
     freeaddrinfo(servinfo);
     return result;

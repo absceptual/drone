@@ -1,2 +1,6 @@
 build/*
 .vscode/*
+node_modules/*
+server/src/node_modules/*
+server/src/yarn.lock
+server/src/package.json
