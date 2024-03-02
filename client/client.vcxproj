@@ -139,6 +139,7 @@
   <ItemGroup>
     <ClInclude Include="headers\client.h" />
     <ClInclude Include="headers\includes.h" />
+    <ClInclude Include="headers\packet.h" />
     <ClInclude Include="headers\socket.h" />
     <ClInclude Include="headers\utility.h" />
   </ItemGroup>
