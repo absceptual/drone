@@ -20,5 +20,6 @@ namespace network
         bool open_connection( );
         void close_connection( );
 
+        int send( std::uint8_t* buffer, size_t size, std::uint8_t opcode = network::binary_opcode );
     };
 }

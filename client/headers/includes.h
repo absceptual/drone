@@ -3,11 +3,13 @@
 #define WIN32_LEAN_AND_MEAN
 #define WINSOCK_VERSION MAKEWORD(2, 2)
 
+#include <algorithm>
+#include <cstdint>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
-#include <cstdint>
-#include <map>
+#include <vector>
 
 #include <windows.h>
 #include <winsock2.h>

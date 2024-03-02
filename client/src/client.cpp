@@ -50,8 +50,8 @@ namespace network
         request += "Sec-WebSocket-Version: 13\r\n\r\n";
 
         char buffer[ 512 ];
-        send( m_socket.get_socket( ), request.c_str( ), request.size( ), NULL );
-        recv( m_socket.get_socket( ), buffer, sizeof( buffer ), NULL );
+        ::send( m_socket.get_socket( ), request.c_str( ), request.size( ), NULL );
+        ::recv( m_socket.get_socket( ), reinterpret_cast< char* >( buffer ), sizeof( buffer ), NULL );
 
         std::string raw_data( buffer );
         if ( raw_data.find( "101 Switching Protocols" ) == std::string::npos )
@@ -62,11 +62,11 @@ namespace network
             return false;
 
         std::string raw_hash, hash;
-        std::uint8_t sha[ 20 ]{ };
+        char sha[ 20 ]{ };
 
         raw_hash = key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-        SHA1( reinterpret_cast< const std::uint8_t* >( raw_hash.c_str( ) ), raw_hash.length( ), sha );
-        hash = utility::base64_encode( sha, 20 );
+        SHA1( reinterpret_cast< const std::uint8_t* >( raw_hash.c_str( ) ), raw_hash.length( ), reinterpret_cast< std::uint8_t* >( sha ) );
+        hash = utility::base64_encode( reinterpret_cast<std::uint8_t*>(sha), 20 );
 
         if ( response.find( "Sec-WebSocket-Accept" ) == response.end( ) || response.find( "Sec-WebSocket-Accept" )->second.compare( hash )  )
             return false;
@@ -79,6 +79,11 @@ namespace network
         WSACleanup( );
         if ( m_socket.is_connected( ) )
             closesocket( m_socket.get_socket( ) );
+    }
+
+    int client::send( std::uint8_t* buffer, size_t size, std::uint8_t opcode )
+    {
+        return m_socket.send( buffer, size, network::text_opcode );
     }
 }
 
