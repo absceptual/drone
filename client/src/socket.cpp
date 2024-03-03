@@ -50,7 +50,7 @@ namespace network
         return this->m_connected;
     }
 
-    int socket::send( std::uint8_t* data, std::size_t size, uint8_t opcode = network::binary_opcode )
+    int socket::send( std::uint8_t* data, std::size_t size )
     {
         std::vector<uint8_t> frame{ };
         uint8_t mask[ 4 ];
@@ -67,7 +67,7 @@ namespace network
             // Prepare WebSocket frame header
             uint8_t header = is_final ? 0x80 : 0x00; // Set FIN bit accordingly
             if ( sent == 0 )
-                header |= opcode; // YOUR_OPCODE_HERE should be 0x1 for text or 0x2 for binary
+                header |= opcode; 
             else
                 header |= 0x0; 
        
@@ -75,44 +75,78 @@ namespace network
             // fin and opcode
             frame.push_back( header );
 
-            
-
             // length
             frame.push_back( 126 | 0x80 ); // Payload length set to 127 for next 8 bytes length
             frame.push_back( ( fragment_size >> 8 ) & 0xFF ); // Extended payload length (high byte)
             frame.push_back( fragment_size & 0xFF );        // Extended payload length (low byte)
 
-            // data
-
             // mask
             for ( int i = 0; i < 4; ++i )
                 frame.push_back( mask[ i ] );
 
+            // data
             for ( size_t i = 0; i < fragment_size; ++i )
                 frame.push_back( data[ i + sent ] ^ mask[ i % 4 ] );
 
-            std::cout << ::send( m_socket, reinterpret_cast< const char* >( frame.data( ) ), frame.size( ), NULL );
+            ::send( m_socket, reinterpret_cast< const char* >( frame.data( ) ), frame.size( ), NULL );
             sent += fragment_size;
         }
 
         // fin and opcode
         frame.push_back( 0x00 );
         frame.clear( );
-        std::cout << ::send( m_socket, reinterpret_cast< const char* >( frame.data( ) ), frame.size( ), NULL );
+        ::send( m_socket, reinterpret_cast< const char* >( frame.data( ) ), frame.size( ), NULL );
         return sent;
     }
 
-    void socket::send_frame_header( std::vector<uint8_t>& frame, std::uint8_t header )
+    void socket::recv( ) 
     {
-        
+        // Clear whatever data we had left from our old receive
+        m_data.clear( );
+
+        bool complete = false;
+        while (!complete )
+        {
+            // Extract whether or not this is the last bit of the message
+            // In reality, I should check the opcode but we only expect binary data anyway
+            char header[ 2 ]{ };
+
+            ::recv( m_socket, header, sizeof( header ), NULL );
+            bool fin = ( header[ 0 ] & 0x80 ) != 0;
+            if (fin)
+                complete = true;
+            
+            // Get the (unextended) length of the payload and then adjust it accordingly
+            uint64_t length{ };
+            length = header[ 1 ] & 0x7F;
+            switch ( length )
+            {
+            case 126:
+                ::recv( m_socket, reinterpret_cast< char* >( &length ), sizeof( std::uint16_t ), NULL );
+                length = ntohs( length );
+                break;
+            case 127:
+                ::recv( m_socket, reinterpret_cast< char* >( &length ), sizeof( std::uint64_t ), NULL );
+                length = ntohll( length );
+                break;
+            default:
+                break;
+            }
+
+            // Add to our final product at the end
+            std::vector<uint8_t> frame{ };
+            frame.resize( length );
+
+            ::recv( m_socket, reinterpret_cast< char* >( frame.data( ) ), length, NULL );
+            m_data.insert( m_data.end( ), frame.begin( ), frame.end( ) );
+        }
+
+        m_data.shrink_to_fit( );
     }
 
-    void socket::send_frame_payload( std::vector<uint8_t>& frame, std::uint8_t* data, std::uint8_t fragment_size, std::uint8_t* mask )
-    { 
-        
-
-        
-       
+    std::vector<std::uint8_t>& socket::get_data( )
+    {
+        return m_data;
     }
     
 }
