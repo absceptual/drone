@@ -11,6 +11,7 @@ namespace network
     private:
         const std::string m_host{ };
         const std::string m_port{ };
+        char* m_data{ };
         socket m_socket{ };
 
     public:
@@ -20,6 +21,8 @@ namespace network
         bool open_connection( );
         void close_connection( );
 
-        int send( std::uint8_t* buffer, size_t size, std::uint8_t opcode = network::binary_opcode );
+        int send( std::uint8_t* buffer, size_t size );
+        std::vector<std::uint8_t> recv( );
+        std::string recv_string( );
     };
 }
