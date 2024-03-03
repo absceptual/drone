@@ -1,0 +1,10 @@
+{
+    "name": "drone",
+    "version": "0.0.1",
+    "description": "client to server communication",
+    "type": "module",
+    "dependencies": {
+        "socket.io": "^4.7.4",
+        "ws": "^8.16.0"
+    }
+}
