@@ -50,7 +50,7 @@ namespace network
         return this->m_connected;
     }
 
-    int socket::send( std::uint8_t* data, std::size_t size )
+    int socket::send( const std::uint8_t* data, std::size_t size )
     {
         std::vector<uint8_t> frame{ };
         uint8_t mask[ 4 ];

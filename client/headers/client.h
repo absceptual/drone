@@ -21,7 +21,7 @@ namespace network
         bool open_connection( );
         void close_connection( );
 
-        int send( std::uint8_t* buffer, size_t size );
+        int send( const std::uint8_t* buffer, size_t size );
         std::vector<std::uint8_t> recv( );
         std::string recv_string( );
     };

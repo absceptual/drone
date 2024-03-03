@@ -83,7 +83,7 @@ namespace network
             closesocket( m_socket.get_socket( ) );
     }
 
-    int client::send( std::uint8_t* buffer, size_t size )
+    int client::send( const std::uint8_t* buffer, size_t size )
     {
         return m_socket.send( buffer, size );
     }
