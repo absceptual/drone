@@ -1,6 +1,6 @@
 #include "../headers/utility.h"
 
-namespace utility 
+namespace utility
 {
 	std::string base64_encode( std::uint8_t* buffer, size_t length )
 	{
@@ -12,12 +12,12 @@ namespace utility
 		bio = BIO_push( b64, bio );
 
 		BIO_set_flags( bio, BIO_FLAGS_BASE64_NO_NL ); //Ignore newlines - write everything in one line
-		BIO_write( bio, buffer, length );
+		BIO_write( bio, buffer, static_cast< int >( length ) );
 		BIO_flush( bio );
 		BIO_get_mem_ptr( bio, &bufferPtr );
 		BIO_set_close( bio, BIO_NOCLOSE );
 
-		std::string text( (*bufferPtr ).data, ( *bufferPtr ).length );
+		std::string text( ( *bufferPtr ).data, ( *bufferPtr ).length );
 		BIO_free_all( bio );
 
 		return text;

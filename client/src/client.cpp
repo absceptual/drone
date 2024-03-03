@@ -52,7 +52,7 @@ namespace network
         request += "Sec-WebSocket-Version: 13\r\n\r\n";
 
         char buffer[ 512 ];
-        ::send( m_socket.get_socket( ), request.c_str( ), request.size( ), NULL );
+        ::send( m_socket.get_socket( ), request.c_str( ), static_cast<int>(request.size( )), NULL );
         ::recv( m_socket.get_socket( ), reinterpret_cast< char* >( buffer ), sizeof( buffer ), NULL );
 
         std::string raw_data( buffer );
@@ -83,7 +83,7 @@ namespace network
             closesocket( m_socket.get_socket( ) );
     }
 
-    int client::send( const std::uint8_t* buffer, size_t size )
+    int client::send( const void* buffer, size_t size )
     {
         return m_socket.send( buffer, size );
     }

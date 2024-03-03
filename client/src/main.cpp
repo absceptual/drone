@@ -25,13 +25,13 @@ int main()
     std::printf( "[+] client attempts to say hello server!\n" );
 
     const char* data = "hello server!";
-    client.send( reinterpret_cast< const std::uint8_t* >( data ), strlen(data) );
+    client.send( data, strlen(data) );
     std::printf( "[+] server responds and says %s\n", client.recv_string( ).c_str( ) );
 
     std::printf( "[+] client sends the server something in binary..\n" );
 
     unsigned char secret = 0x90;
-    client.send( reinterpret_cast< std::uint8_t* >( &secret ), sizeof( std::uint8_t ) );
+    client.send( &secret, sizeof( std::uint8_t ) );
 
     auto response_string = client.recv_string( );
     if ( response_string.empty() )

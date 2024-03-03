@@ -50,13 +50,13 @@ namespace network
         return this->m_connected;
     }
 
-    int socket::send( const std::uint8_t* data, std::size_t size )
+    int socket::send( const void* data, std::size_t size )
     {
         std::vector<uint8_t> frame{ };
         uint8_t mask[ 4 ];
         RAND_bytes( mask, 4 );
 
-        size_t sent{ };
+        int sent{ };
         while ( sent < size )
         {
             size_t fragment_size = min( size - sent, MAX_FRAGMENT_SIZE );
@@ -86,16 +86,17 @@ namespace network
 
             // data
             for ( size_t i = 0; i < fragment_size; ++i )
-                frame.push_back( data[ i + sent ] ^ mask[ i % 4 ] );
+                frame.push_back( reinterpret_cast< const std::uint8_t* >( data )[ i + sent ] ^ mask[ i % 4 ] );
 
-            ::send( m_socket, reinterpret_cast< const char* >( frame.data( ) ), frame.size( ), NULL );
-            sent += fragment_size;
+            ::send( m_socket, reinterpret_cast< const char* >( frame.data( ) ), static_cast< int >( frame.size( )), NULL );
+            sent += static_cast< int >( fragment_size );
         }
 
         // fin and opcode
         frame.push_back( 0x00 );
         frame.clear( );
-        ::send( m_socket, reinterpret_cast< const char* >( frame.data( ) ), frame.size( ), NULL );
+        ::send( m_socket, reinterpret_cast< const char* >( frame.data( ) ), static_cast< int >( frame.size( )), NULL );
+
         return sent;
     }
 
@@ -123,7 +124,7 @@ namespace network
             {
             case 126:
                 ::recv( m_socket, reinterpret_cast< char* >( &length ), sizeof( std::uint16_t ), NULL );
-                length = ntohs( length );
+                length = ntohs( static_cast< u_short >( length ) );
                 break;
             case 127:
                 ::recv( m_socket, reinterpret_cast< char* >( &length ), sizeof( std::uint64_t ), NULL );
@@ -137,7 +138,7 @@ namespace network
             std::vector<uint8_t> frame{ };
             frame.resize( length );
 
-            ::recv( m_socket, reinterpret_cast< char* >( frame.data( ) ), length, NULL );
+            ::recv( m_socket, reinterpret_cast< char* >( frame.data( ) ), static_cast<int>(length), NULL );
             m_data.insert( m_data.end( ), frame.begin( ), frame.end( ) );
         }
 

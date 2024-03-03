@@ -22,7 +22,7 @@ namespace network
         bool is_connected( ) const;
 
         // DATA HAS TO BE ATLEAST 1024
-        int send( const std::uint8_t* data, std::size_t size );
+        int send( const void* data, std::size_t size );
         void recv( );
 
         std::vector<std::uint8_t>& get_data( );

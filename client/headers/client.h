@@ -12,7 +12,7 @@ namespace network
         const std::string m_host{ };
         const std::string m_port{ };
         char* m_data{ };
-        socket m_socket{ };
+        socket m_socket;
 
     public:
         client( std::string host, std::string port );
@@ -21,7 +21,7 @@ namespace network
         bool open_connection( );
         void close_connection( );
 
-        int send( const std::uint8_t* buffer, size_t size );
+        int send( const void* buffer, size_t size );
         std::vector<std::uint8_t> recv( );
         std::string recv_string( );
     };
