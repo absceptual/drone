@@ -42,4 +42,9 @@ namespace utility
 
 		return headers;
 	}
+
+	std::string string_from_recv( std::vector<std::uint8_t> buffer )
+	{
+		return std::string( buffer.begin( ), buffer.end( ) );
+	}
 }
