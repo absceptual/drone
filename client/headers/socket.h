@@ -18,10 +18,9 @@ namespace network
         socket( ) = default;
         socket( std::string host, std::string port );
 
-        SOCKET& get_socket( );
+        SOCKET& get_socket( ) const;
         bool is_connected( ) const;
 
-        // DATA HAS TO BE ATLEAST 1024
         int send( const void* data, std::size_t size );
         void recv( );
 
