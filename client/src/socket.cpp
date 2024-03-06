@@ -40,14 +40,14 @@ namespace network
         freeaddrinfo( servinfo );
     }
 
-    SOCKET& socket::get_socket( )
+    SOCKET& socket::get_socket( ) const
     {
         return m_socket;
     }
 
     bool socket::is_connected( ) const
     {
-        return this->m_connected;
+        return m_connected;
     }
 
     int socket::send( const void* data, std::size_t size )
